@@ -1,9 +1,9 @@
 import { AgentMove, EntityType, GameStateClient, IGameState } from "@coderone/game-library";
 import { MapDecomposer } from "./MapDecomposer";
-import Utils from "./utils";
-("use strict");
 
-const gameConnectionString = process.env["GAME_CONNECTION_STRING"] || "ws://127.0.0.1:3000/?role=agent&agentId=agentIdA&name=RandomAgent";
+const gameConnectionString =
+    process.env["GAME_CONNECTION_STRING"] ||
+    "ws://127.0.0.1:3000/?role=agent&agentId=agentIdA&name=RandomAgent";
 
 enum Action {
     Up = "up",
@@ -75,7 +75,9 @@ class Agent {
         }
     };
 
-    private getBombToDetonate = (gameState: Omit<IGameState, "connection">): [number, number] | undefined => {
+    private getBombToDetonate = (
+        gameState: Omit<IGameState, "connection">
+    ): [number, number] | undefined => {
         const currentAgent = this.client.Connection?.agent_number;
         const bomb = gameState.entities.find((entity) => {
             const isBomb = entity.type === EntityType.Bomb;
