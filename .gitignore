@@ -1,4 +1,8 @@
 __pycache__/
+.vscode/*
 node_modules
 typescript/dist
 *.log
+.idea
+
+

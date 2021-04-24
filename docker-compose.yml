@@ -10,7 +10,7 @@ services:
             - ADMIN_ROLE_ENABLED=0
             - AGENT_ID_MAPPING=agentA,agentB
             - INITIAL_AMMUNITION=3
-            - INITIAL_HP=99
+            - INITIAL_HP=3
             - PRNG_SEED=1234
             - SHUTDOWN_ON_GAME_END_ENABLED=1
             - TELEMETRY_ENABLED=1
@@ -19,6 +19,9 @@ services:
             - WORLD_SEED=1234
         networks:
             - coderone-tournament
+
+    # UNCOMMENT THE NEXT BLOCK AFTER YOU HAVE CONNECTED AS A HUMAN AGENT PLAYING AGAINST THE RANDOM_AGENT
+
     agent-a:
         extends:
             file: base-compose.yml
@@ -40,10 +43,10 @@ services:
         environment:
             - TELEMETRY_ENABLED=0
             - PORT=6969
+            - WORLD_SEED=1234
+            - PRNG_SEED=1234
         networks:
             - coderone-tournament
-
-    # UNCOMMENT THE NEXT BLOCK AFTER YOU HAVE CONNECTED AS A HUMAN AGENT PLAYING AGAINST THE RANDOM_AGENT
 
     agent-b:
         extends:
@@ -66,6 +69,8 @@ services:
         environment:
             - TELEMETRY_ENABLED=0
             - PORT=6969
+            - WORLD_SEED=1234
+            - PRNG_SEED=1234
         networks:
             - coderone-tournament
 networks:
