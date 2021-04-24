@@ -1,4 +1,6 @@
 import { AgentMove, EntityType, GameStateClient, IGameState } from "@coderone/game-library";
+import { MapDecomposer } from "./MapDecomposer";
+("use strict");
 
 const gameConnectionString = process.env["GAME_CONNECTION_STRING"] || "ws://127.0.0.1:3000/?role=agent&agentId=agentIdA&name=RandomAgent";
 enum Action {
@@ -21,12 +23,21 @@ const actionList = Object.values(Action);
 
 class Agent {
     private readonly client = new GameStateClient(gameConnectionString);
+    private mapDecomposer: MapDecomposer;
     public constructor() {
         this.client.SetGameTickCallback(this.onGameTick);
+        this.mapDecomposer = new MapDecomposer();
     }
 
     private onGameTick = async (gameState: Omit<IGameState, "connection"> | undefined) => {
         if (gameState) {
+            // update map state and update dangerMap
+            this.mapDecomposer.updateState(gameState);
+            this.mapDecomposer.getDangerMap();
+
+            // Show dangerMap
+            // console.log(this.mapDecomposer.toString());
+
             const action = await this.generateAction();
             if (action) {
                 const mappedMove = actionMoveMap.get(action);
