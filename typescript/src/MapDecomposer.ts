@@ -1,9 +1,13 @@
 import { EntityType, IEntity, IGameState } from "@coderone/game-library";
 
 export class MapDecomposer {
+    private readonly powerUpIndicator = 1;
+    private readonly emptySpace = 0;
     private readonly width: number = 9;
     private readonly height: number = 9;
     private dangerMap: Array<Array<number>> = [];
+    private powerUpMap: Array<Array<number>> = [];
+    private distanceMap: Array<Array<number>> = [];
     private gameState: IGameState | undefined = undefined;
 
     /**
@@ -23,7 +27,7 @@ export class MapDecomposer {
         this.dangerMap = Array(this.height)
             .fill(0)
             .map(() => Array(this.width).fill(0));
-
+        
         // Grab bombs from state
         this.gameState?.entities
             .filter((entity) => entity.type === EntityType.Bomb)
@@ -46,6 +50,42 @@ export class MapDecomposer {
         }
     }
 
+    public getPowerUpMap(): Array<Array<number>> {
+        //we will treat all powerups as the same for now
+
+        this.powerUpMap = Array(this.height)
+        .fill(this.emptySpace)
+        .map(() => Array(this.width).fill(0));
+
+        //similar to danger map, retrieve powerups from map
+        this.gameState?.entities
+            .filter((entity) => entity.type === EntityType.Ammo || entity.type === EntityType.BlastPowerup)
+            .forEach(powerUp => {
+                this.powerUpMap[powerUp.y][powerUp.x] = this.powerUpIndicator;
+            })
+
+        return this.powerUpMap;
+    }
+
+    //WIP
+    // public getDistanceMap(agentCoordinates: number[]): Array<Array<number>> {
+    //     this.distanceMap = Array(this.height)
+    //     .fill(this.emptySpace)
+    //     .map(() => Array(this.width).fill(0));
+        
+    //     this.distanceMap.forEach((row, rowIndex) => 
+    //         row.forEach((value, colIndex) => 
+    //             this.distanceMap[rowindex][colIndex] = this.manhattanDistance(agentCoordinates, [rowindex, colNum]))) //.foreach((value, colNum) => this.manhattanDistance(agentCoordinates, [rowindex, colNum])))
+    //     return this.distanceMap;
+    // }
+    
+    private manhattanDistance(start: number[], end:number[]): number {
+        let distance = Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1]);
+
+        return distance;
+    }
+    
+
     /**
      * toString
      */
@@ -54,6 +94,17 @@ export class MapDecomposer {
         for (let row = 0; row < this.width; row++) {
             for (let col = 0; col < this.width; col++) {
                 str += this.dangerMap[row][col].toString();
+            }
+            str += "\n";
+        }
+        return str;
+    }
+
+    public displayAnyMap(myMap: Array<Array<number>>): String {
+        let str: String = "";
+        for (let row = 0; row < this.width; row++) {
+            for (let col = 0; col < this.width; col++) {
+                str += myMap[row][col].toString();
             }
             str += "\n";
         }

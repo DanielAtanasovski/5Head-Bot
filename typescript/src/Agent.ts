@@ -1,4 +1,5 @@
 import { AgentMove, EntityType, GameStateClient, IGameState } from "@coderone/game-library";
+import { createNoSubstitutionTemplateLiteral } from "typescript";
 import { MapDecomposer } from "./MapDecomposer";
 
 const gameConnectionString =
@@ -41,11 +42,17 @@ class Agent {
 
             // update map state and update dangerMap
             this.mapDecomposer.updateState(gameState);
-            this.mapDecomposer.getDangerMap();
-
+            // this.mapDecomposer.getDangerMap();
             // Show dangerMap
             // console.log(this.mapDecomposer.toString());
+            //this.mapDecomposer.addPowerUpLocations();
 
+            //distances WIP
+            // if (this.agentId != null) {
+            //     console.log(this.mapDecomposer.getDistanceMap([gameState.agent_state[this.agentId.toString()]][0].coordinates))
+            // }
+
+            //console.log(this.findClosestPowerUp(gameState, this.mapDecomposer.powerUpLocations));
             const action = await this.generateAction();
             if (action) {
                 const mappedMove = actionMoveMap.get(action);
@@ -75,6 +82,11 @@ class Agent {
         }
     };
 
+    private manhattanDistance = (start: number[], end:number[]) => {
+        let distance = Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1]);
+
+        return distance;
+    }
     private getBombToDetonate = (
         gameState: Omit<IGameState, "connection">
     ): [number, number] | undefined => {
