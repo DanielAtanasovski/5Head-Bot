@@ -1,5 +1,4 @@
 import { EntityType, IEntity, IGameState } from "@coderone/game-library";
-("use strict");
 
 export class MapDecomposer {
     private width = 9;
@@ -32,13 +31,17 @@ export class MapDecomposer {
         }
 
         // Grab bombs from state can update danger positions
-        this.gameState?.entities.find((entity) => {
+        var bombs = this.gameState?.entities.filter((entity, index, array) => {
             if (entity.type === EntityType.Bomb) {
-                var thisID: number = entity.owner!;
-                var blastDiameter: number = this.gameState?.agent_state[thisID].blast_diameter!;
-                this.addBombToDangerMap(this.dangerMap, entity, blastDiameter);
+                return entity;
             }
         });
+        if (bombs != undefined)
+            bombs.forEach((bomb) => {
+                var thisID: number = bomb.owner!;
+                var blastDiameter: number = this.gameState?.agent_state[thisID].blast_diameter!;
+                this.addBombToDangerMap(this.dangerMap, bomb, blastDiameter);
+            });
 
         return this.dangerMap;
     }
