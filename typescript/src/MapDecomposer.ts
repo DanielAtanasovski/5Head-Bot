@@ -97,23 +97,6 @@ export class MapDecomposer {
         return this.clearPathMap;
     }
 
-    //WIP
-    // public getDistanceMap(agentCoordinates: [number, number]): Array<Array<number>> {
-    //     this.distanceMap = Array(this.height)
-    //         .fill(this.emptySpace)
-    //         .map(() => Array(this.width).fill(0));
-    //
-    //     this.distanceMap.forEach((row, rowIndex) =>
-    //         row.forEach(
-    //             (value, colIndex) =>
-    //                 (this.distanceMap[rowindex][
-    //                     colIndex
-    //                 ] = Utils.manhattanDistance(agentCoordinates, [rowindex, colNum]))
-    //         )
-    //     ); //.foreach((value, colNum) => this.manhattanDistance(agentCoordinates, [rowindex, colNum])))
-    //     return this.distanceMap;
-    // }
-
     /**
      * toString
      */
