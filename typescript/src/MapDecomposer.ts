@@ -14,7 +14,6 @@ export class MapDecomposer {
     private dangerMap: MapType = [];
     private powerUpMap: MapType = [];
     private obstructionsMap: MapType = [];
-    private distanceMap: MapType = [];
 
     private readonly finder = new PF.AStarFinder();
     private gameState: IGameState | undefined = undefined;
@@ -85,12 +84,12 @@ export class MapDecomposer {
     }
 
     private addBombToDangerMap(bomb: IEntity, blastDiameter: number): void {
-        this.dangerMap[bomb.y][bomb.x] = 1;
+        this.dangerMap[bomb.y][bomb.x] = this.invalid;
         for (let dir = 1; dir < Math.ceil(blastDiameter / 2); dir++) {
-            this.dangerMap[Math.min(bomb.y + dir, this.height - 1)][bomb.x] = 1;
-            this.dangerMap[Math.max(bomb.y - dir, 0)][bomb.x] = 1;
-            this.dangerMap[bomb.y][Math.min(bomb.x + dir, this.width - 1)] = 1;
-            this.dangerMap[bomb.y][Math.max(bomb.x - dir, 0)] = 1;
+            this.dangerMap[Math.min(bomb.y + dir, this.height - 1)][bomb.x] = this.invalid;
+            this.dangerMap[Math.max(bomb.y - dir, 0)][bomb.x] = this.invalid;
+            this.dangerMap[bomb.y][Math.min(bomb.x + dir, this.width - 1)] = this.invalid;
+            this.dangerMap[bomb.y][Math.max(bomb.x - dir, 0)] = this.invalid;
         }
     }
 
@@ -112,8 +111,8 @@ export class MapDecomposer {
     }
 
     /**
-     * getClearPathMap
-     * Returns an Array matrix of cells assigned a value of '0' for obstructed tiles and '1' for clear tiles
+     * getObstructionsMap
+     * Returns an Array matrix of cells assigned a value of '0' for clear tiles and '1' for obstructed tiles
      */
     public getObstructionsMap(): MapType {
         this.obstructionsMap = this.emptyMap();
@@ -132,23 +131,6 @@ export class MapDecomposer {
 
         return this.obstructionsMap;
     }
-
-    //WIP
-    // public getDistanceMap(agentCoordinates: [number, number]): MapType {
-    //     this.distanceMap = Array(this.height)
-    //         .fill(this.emptySpace)
-    //         .map(() => Array(this.width).fill(0));
-    //
-    //     this.distanceMap.forEach((row, rowIndex) =>
-    //         row.forEach(
-    //             (value, colIndex) =>
-    //                 (this.distanceMap[rowindex][
-    //                     colIndex
-    //                 ] = Utils.manhattanDistance(agentCoordinates, [rowindex, colNum]))
-    //         )
-    //     ); //.foreach((value, colNum) => this.manhattanDistance(agentCoordinates, [rowindex, colNum])))
-    //     return this.distanceMap;
-    // }
 
     /**
      * toString

@@ -43,13 +43,6 @@ class Agent {
             // Show dangerMap
             // console.log(this.mapDecomposer.toString());
             //this.mapDecomposer.addPowerUpLocations();
-
-            //distances WIP
-            // if (this.agentId != null) {
-            //     console.log(this.mapDecomposer.getDistanceMap([gameState.agent_state[this.agentId.toString()]][0].coordinates))
-            // }
-
-            //console.log(this.findClosestPowerUp(gameState, this.mapDecomposer.powerUpLocations));
             const action = await this.generateAction();
             if (action) {
                 const mappedMove = actionMoveMap.get(action);
