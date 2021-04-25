@@ -1,5 +1,4 @@
 import { AgentMove, EntityType, GameStateClient, IGameState } from "@coderone/game-library";
-import { createNoSubstitutionTemplateLiteral } from "typescript";
 import { MapDecomposer } from "./MapDecomposer";
 import { Coordinates } from "./types";
 

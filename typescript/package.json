@@ -5,6 +5,7 @@
     "private": true,
     "dependencies": {
         "@coderone/game-library": "^1.0.4",
+        "pathfinding": "^0.4.18",
         "typescript": "^4.0.3"
     },
     "scripts": {
