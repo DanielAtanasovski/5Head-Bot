@@ -82,11 +82,6 @@ class Agent {
         }
     };
 
-    private manhattanDistance = (start: number[], end:number[]) => {
-        let distance = Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1]);
-
-        return distance;
-    }
     private getBombToDetonate = (
         gameState: Omit<IGameState, "connection">
     ): [number, number] | undefined => {
