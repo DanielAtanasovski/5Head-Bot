@@ -1,12 +1,13 @@
 import { EntityType, IEntity, IGameState } from "@coderone/game-library";
 
 export class MapDecomposer {
-    private readonly powerUpIndicator = 1;
-    private readonly emptySpace = 0;
+    private readonly validIndicator = 1;
+    private readonly invalidIndicator = 0;
     private readonly width: number = 9;
     private readonly height: number = 9;
     private dangerMap: Array<Array<number>> = [];
     private powerUpMap: Array<Array<number>> = [];
+    private clearPathMap: Array<Array<number>> = [];
     private distanceMap: Array<Array<number>> = [];
     private gameState: IGameState | undefined = undefined;
 
@@ -20,13 +21,13 @@ export class MapDecomposer {
 
     /**
      * getDangerMap
-     * Provides an Array matrix of cells assigned a value of '0' for safe and '1' for danger
+     * Returns an Array matrix of cells assigned a value of '0' for safe and '1' for danger
      */
     public getDangerMap(): Array<Array<number>> {
         // Assign default values to map
         this.dangerMap = Array(this.height)
-            .fill(0)
-            .map(() => Array(this.width).fill(0));
+            .fill(this.invalidIndicator)
+            .map(() => Array(this.width).fill(this.invalidIndicator));
 
         // Grab bombs from state
         this.gameState?.entities
@@ -54,8 +55,8 @@ export class MapDecomposer {
         //we will treat all powerups as the same for now
 
         this.powerUpMap = Array(this.height)
-            .fill(this.emptySpace)
-            .map(() => Array(this.width).fill(0));
+            .fill(this.invalidIndicator)
+            .map(() => Array(this.width).fill(this.invalidIndicator));
 
         //similar to danger map, retrieve powerups from map
         this.gameState?.entities
@@ -64,10 +65,35 @@ export class MapDecomposer {
                     entity.type === EntityType.Ammo || entity.type === EntityType.BlastPowerup
             )
             .forEach((powerUp) => {
-                this.powerUpMap[powerUp.y][powerUp.x] = this.powerUpIndicator;
+                this.powerUpMap[powerUp.y][powerUp.x] = this.validIndicator;
             });
 
         return this.powerUpMap;
+    }
+
+    /**
+     * getClearPathMap
+     * Returns an Array matrix of cells assigned a value of '0' for obstructed tiles and '1' for clear tiles
+     */
+    public getClearPathMap(): Array<Array<number>> {
+        // Default values
+        this.clearPathMap = Array(this.height)
+            .fill(this.invalidIndicator)
+            .map(() => Array(this.width).fill(this.invalidIndicator));
+
+        this.gameState?.entities
+            .filter(
+                (entity) =>
+                    entity.type === EntityType.Bomb ||
+                    entity.type === EntityType.WoodBlock ||
+                    entity.type === EntityType.MetalBlock ||
+                    entity.type === EntityType.OreBlock
+            )
+            .forEach((tile) => {
+                this.clearPathMap[tile.y][tile.x] = this.validIndicator;
+            });
+
+        return this.clearPathMap;
     }
 
     //WIP
