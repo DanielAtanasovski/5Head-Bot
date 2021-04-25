@@ -1,5 +1,7 @@
+import { Coordinates } from "./types";
+
 export class Utils {
-    static manhattanDistance(start: [number, number], end: [number, number]) {
-        return Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1]);
+    static manhattanDistance(start: Coordinates, end: Coordinates) {
+        return Math.abs(start.x - end.x) + Math.abs(start.y - end.y);
     }
 }
