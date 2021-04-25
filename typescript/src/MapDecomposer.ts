@@ -14,7 +14,7 @@ export class MapDecomposer {
      * updateState
      * Updates local state to new state (entities, agents)
      */
-    public updateState(gameState: IGameState) {
+    public updateState(gameState: IGameState): void {
         this.gameState = gameState;
     }
 
@@ -27,7 +27,7 @@ export class MapDecomposer {
         this.dangerMap = Array(this.height)
             .fill(0)
             .map(() => Array(this.width).fill(0));
-        
+
         // Grab bombs from state
         this.gameState?.entities
             .filter((entity) => entity.type === EntityType.Bomb)
@@ -40,7 +40,7 @@ export class MapDecomposer {
         return this.dangerMap;
     }
 
-    private addBombToDangerMap(bomb: IEntity, blastDiameter: number) {
+    private addBombToDangerMap(bomb: IEntity, blastDiameter: number): void {
         this.dangerMap[bomb.y][bomb.x] = 1;
         for (let dir = 1; dir < Math.ceil(blastDiameter / 2); dir++) {
             this.dangerMap[Math.max(bomb.y + dir, this.height - 1)][bomb.x] = 1;
@@ -54,15 +54,18 @@ export class MapDecomposer {
         //we will treat all powerups as the same for now
 
         this.powerUpMap = Array(this.height)
-        .fill(this.emptySpace)
-        .map(() => Array(this.width).fill(0));
+            .fill(this.emptySpace)
+            .map(() => Array(this.width).fill(0));
 
         //similar to danger map, retrieve powerups from map
         this.gameState?.entities
-            .filter((entity) => entity.type === EntityType.Ammo || entity.type === EntityType.BlastPowerup)
-            .forEach(powerUp => {
+            .filter(
+                (entity) =>
+                    entity.type === EntityType.Ammo || entity.type === EntityType.BlastPowerup
+            )
+            .forEach((powerUp) => {
                 this.powerUpMap[powerUp.y][powerUp.x] = this.powerUpIndicator;
-            })
+            });
 
         return this.powerUpMap;
     }
@@ -72,24 +75,23 @@ export class MapDecomposer {
     //     this.distanceMap = Array(this.height)
     //     .fill(this.emptySpace)
     //     .map(() => Array(this.width).fill(0));
-        
-    //     this.distanceMap.forEach((row, rowIndex) => 
-    //         row.forEach((value, colIndex) => 
+
+    //     this.distanceMap.forEach((row, rowIndex) =>
+    //         row.forEach((value, colIndex) =>
     //             this.distanceMap[rowindex][colIndex] = this.manhattanDistance(agentCoordinates, [rowindex, colNum]))) //.foreach((value, colNum) => this.manhattanDistance(agentCoordinates, [rowindex, colNum])))
     //     return this.distanceMap;
     // }
-    
-    private manhattanDistance(start: number[], end:number[]): number {
+
+    private manhattanDistance(start: number[], end: number[]): number {
         let distance = Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1]);
 
         return distance;
     }
-    
 
     /**
      * toString
      */
-    public toString() {
+    public toString(): String {
         let str: String = "";
         for (let row = 0; row < this.width; row++) {
             for (let col = 0; col < this.width; col++) {
