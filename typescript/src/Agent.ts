@@ -28,7 +28,6 @@ class Agent {
     private readonly client = new GameStateClient(gameConnectionString);
 
     private mapDecomposer: MapDecomposer;
-    private agentId: number | null = null;
 
     public constructor() {
         // @ts-ignore
@@ -38,8 +37,6 @@ class Agent {
 
     private onGameTick = async (gameState: IGameState | undefined) => {
         if (gameState) {
-            if (gameState.tick === 0) this.initAgent(gameState);
-
             // update map state and update dangerMap
             this.mapDecomposer.updateState(gameState);
             // this.mapDecomposer.getDangerMap();
@@ -68,10 +65,6 @@ class Agent {
                 }
             }
         }
-    };
-
-    private initAgent = (gameState: IGameState) => {
-        this.agentId = gameState.connection.agent_number;
     };
 
     private generateAction = (): Action | undefined => {

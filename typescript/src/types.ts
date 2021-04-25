@@ -7,3 +7,5 @@ export class Coordinates {
         this.y = y;
     }
 }
+
+export type MapType = Array<Array<number>>;

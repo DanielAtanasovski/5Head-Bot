@@ -1,15 +1,22 @@
-import { EntityType, IEntity, IGameState } from "@coderone/game-library";
+import { EntityType, IEntity, IGameState, IAgentStateHashMap } from "@coderone/game-library";
 import { Utils } from "./utils";
+import { Coordinates, MapType } from "./types";
+
+const PF = require("pathfinding");
 
 export class MapDecomposer {
-    private readonly validIndicator = 1;
-    private readonly invalidIndicator = 0;
+    private readonly invalid = 1;
+    private readonly valid = 0;
     private readonly width: number = 9;
     private readonly height: number = 9;
-    private dangerMap: Array<Array<number>> = [];
-    private powerUpMap: Array<Array<number>> = [];
-    private clearPathMap: Array<Array<number>> = [];
-    private distanceMap: Array<Array<number>> = [];
+    private agentId: number | null = null;
+
+    private dangerMap: MapType = [];
+    private powerUpMap: MapType = [];
+    private obstructionsMap: MapType = [];
+    private distanceMap: MapType = [];
+
+    private readonly finder = new PF.AStarFinder();
     private gameState: IGameState | undefined = undefined;
 
     /**
@@ -17,18 +24,53 @@ export class MapDecomposer {
      * Updates local state to new state (entities, agents)
      */
     public updateState(gameState: IGameState): void {
+        if (gameState.tick === 0) this.initMap(gameState);
         this.gameState = gameState;
+    }
+
+    private initMap(gameState: IGameState) {
+        this.agentId = gameState.connection.agent_number;
+    }
+
+    private emptyMap(): MapType {
+        // Assign default values to map
+        return Array(this.height)
+            .fill(this.valid)
+            .map(() => Array(this.width).fill(this.valid));
+    }
+
+    private mergeMaps(...maps: MapType[]) {
+        const mergedMap = this.emptyMap();
+
+        maps.forEach((map) => {
+            map.forEach((row, rowIdx) => {
+                row.forEach((val, colIdx) => {
+                    mergedMap[rowIdx][colIdx] = val || mergedMap[rowIdx][colIdx];
+                });
+            });
+        });
+
+        return mergedMap;
+    }
+
+    public getPathTo(dest: Coordinates) {
+        const matrix = this.mergeMaps(this.getDangerMap(), this.getObstructionsMap());
+
+        const grid = new PF.Grid(matrix);
+        return this.finder.findPath(
+            ...this.gameState?.agent_state[this.agentId as keyof IAgentStateHashMap].coordinates!,
+            dest.x,
+            dest.y,
+            grid
+        );
     }
 
     /**
      * getDangerMap
      * Returns an Array matrix of cells assigned a value of '0' for safe and '1' for danger
      */
-    public getDangerMap(): Array<Array<number>> {
-        // Assign default values to map
-        this.dangerMap = Array(this.height)
-            .fill(this.invalidIndicator)
-            .map(() => Array(this.width).fill(this.invalidIndicator));
+    public getDangerMap(): MapType {
+        this.dangerMap = this.emptyMap();
 
         // Grab bombs from state
         this.gameState?.entities
@@ -52,12 +94,9 @@ export class MapDecomposer {
         }
     }
 
-    public getPowerUpMap(): Array<Array<number>> {
+    public getPowerUpMap(): MapType {
         //we will treat all powerups as the same for now
-
-        this.powerUpMap = Array(this.height)
-            .fill(this.invalidIndicator)
-            .map(() => Array(this.width).fill(this.invalidIndicator));
+        this.powerUpMap = this.emptyMap();
 
         //similar to danger map, retrieve powerups from map
         this.gameState?.entities
@@ -66,7 +105,7 @@ export class MapDecomposer {
                     entity.type === EntityType.Ammo || entity.type === EntityType.BlastPowerup
             )
             .forEach((powerUp) => {
-                this.powerUpMap[powerUp.y][powerUp.x] = this.validIndicator;
+                this.powerUpMap[powerUp.y][powerUp.x] = this.invalid;
             });
 
         return this.powerUpMap;
@@ -76,11 +115,8 @@ export class MapDecomposer {
      * getClearPathMap
      * Returns an Array matrix of cells assigned a value of '0' for obstructed tiles and '1' for clear tiles
      */
-    public getClearPathMap(): Array<Array<number>> {
-        // Default values
-        this.clearPathMap = Array(this.height)
-            .fill(this.invalidIndicator)
-            .map(() => Array(this.width).fill(this.invalidIndicator));
+    public getObstructionsMap(): MapType {
+        this.obstructionsMap = this.emptyMap();
 
         this.gameState?.entities
             .filter(
@@ -91,14 +127,14 @@ export class MapDecomposer {
                     entity.type === EntityType.OreBlock
             )
             .forEach((tile) => {
-                this.clearPathMap[tile.y][tile.x] = this.validIndicator;
+                this.obstructionsMap[tile.y][tile.x] = this.invalid;
             });
 
-        return this.clearPathMap;
+        return this.obstructionsMap;
     }
 
     //WIP
-    // public getDistanceMap(agentCoordinates: [number, number]): Array<Array<number>> {
+    // public getDistanceMap(agentCoordinates: [number, number]): MapType {
     //     this.distanceMap = Array(this.height)
     //         .fill(this.emptySpace)
     //         .map(() => Array(this.width).fill(0));
@@ -121,7 +157,7 @@ export class MapDecomposer {
         this.displayAnyMap(this.dangerMap);
     }
 
-    public displayAnyMap(myMap: Array<Array<number>>): String {
+    public displayAnyMap(myMap: MapType): String {
         let str: String = "";
         for (let row = 0; row < this.width; row++) {
             for (let col = 0; col < this.width; col++) {
