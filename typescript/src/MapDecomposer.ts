@@ -1,4 +1,5 @@
 import { EntityType, IEntity, IGameState } from "@coderone/game-library";
+import { Utils } from "./utils";
 
 export class MapDecomposer {
     private readonly validIndicator = 1;
@@ -44,10 +45,10 @@ export class MapDecomposer {
     private addBombToDangerMap(bomb: IEntity, blastDiameter: number): void {
         this.dangerMap[bomb.y][bomb.x] = 1;
         for (let dir = 1; dir < Math.ceil(blastDiameter / 2); dir++) {
-            this.dangerMap[Math.max(bomb.y + dir, this.height - 1)][bomb.x] = 1;
-            this.dangerMap[Math.min(bomb.y - dir, 0)][bomb.x] = 1;
-            this.dangerMap[bomb.y][Math.max(bomb.x + dir, this.width - 1)] = 1;
-            this.dangerMap[bomb.y][Math.min(bomb.x - dir, 0)] = 1;
+            this.dangerMap[Math.min(bomb.y + dir, this.height - 1)][bomb.x] = 1;
+            this.dangerMap[Math.max(bomb.y - dir, 0)][bomb.x] = 1;
+            this.dangerMap[bomb.y][Math.min(bomb.x + dir, this.width - 1)] = 1;
+            this.dangerMap[bomb.y][Math.max(bomb.x - dir, 0)] = 1;
         }
     }
 
@@ -97,35 +98,27 @@ export class MapDecomposer {
     }
 
     //WIP
-    // public getDistanceMap(agentCoordinates: number[]): Array<Array<number>> {
+    // public getDistanceMap(agentCoordinates: [number, number]): Array<Array<number>> {
     //     this.distanceMap = Array(this.height)
-    //     .fill(this.emptySpace)
-    //     .map(() => Array(this.width).fill(0));
-
+    //         .fill(this.emptySpace)
+    //         .map(() => Array(this.width).fill(0));
+    //
     //     this.distanceMap.forEach((row, rowIndex) =>
-    //         row.forEach((value, colIndex) =>
-    //             this.distanceMap[rowindex][colIndex] = this.manhattanDistance(agentCoordinates, [rowindex, colNum]))) //.foreach((value, colNum) => this.manhattanDistance(agentCoordinates, [rowindex, colNum])))
+    //         row.forEach(
+    //             (value, colIndex) =>
+    //                 (this.distanceMap[rowindex][
+    //                     colIndex
+    //                 ] = Utils.manhattanDistance(agentCoordinates, [rowindex, colNum]))
+    //         )
+    //     ); //.foreach((value, colNum) => this.manhattanDistance(agentCoordinates, [rowindex, colNum])))
     //     return this.distanceMap;
     // }
-
-    private manhattanDistance(start: number[], end: number[]): number {
-        let distance = Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1]);
-
-        return distance;
-    }
 
     /**
      * toString
      */
-    public toString(): String {
-        let str: String = "";
-        for (let row = 0; row < this.width; row++) {
-            for (let col = 0; col < this.width; col++) {
-                str += this.dangerMap[row][col].toString();
-            }
-            str += "\n";
-        }
-        return str;
+    public toString() {
+        this.displayAnyMap(this.dangerMap);
     }
 
     public displayAnyMap(myMap: Array<Array<number>>): String {
